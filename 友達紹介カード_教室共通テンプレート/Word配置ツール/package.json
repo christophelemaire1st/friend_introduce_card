@@ -1,0 +1,8 @@
+{
+  "name": "friend-introduce-card-export",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HTML to card images",
+  "engines": {"node": ">=22"},
+  "dependencies": {"playwright": "1.58.2"}
+}

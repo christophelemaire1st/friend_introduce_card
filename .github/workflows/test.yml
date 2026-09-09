@@ -1,0 +1,32 @@
+name: Cross-platform export
+on: [push, pull_request]
+jobs:
+  export:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        shell: python
+        run: |
+          import os, pathlib, subprocess, sys
+          tools = next(pathlib.Path('.').glob('友達*')) / 'Word配置ツール'
+          subprocess.run([sys.executable, '-m', 'venv', str(tools / '.venv')], check=True)
+          python = tools / '.venv' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+          subprocess.run([str(python), '-m', 'pip', 'install', '-r', str(tools / 'requirements.txt')], check=True)
+          subprocess.run(['npm.cmd' if os.name == 'nt' else 'npm', 'ci'], cwd=tools, check=True)
+          subprocess.run(['npx.cmd' if os.name == 'nt' else 'npx', 'playwright', 'install', '--with-deps', 'chromium'], cwd=tools, check=True)
+      - name: Test actual Word export
+        env:
+          RUN_EXPORT_TESTS: '1'
+          PYTHONUTF8: '1'
+        run: python -m unittest discover -s tests -v

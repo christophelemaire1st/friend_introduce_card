@@ -1,0 +1,7 @@
+node_modules/
+.venv/
+__pycache__/
+*_編集済み.html
+友達紹介カード_*.docx
+Word用素材/
+.word-*/
